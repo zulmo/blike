@@ -1,0 +1,32 @@
+2-8 player
+2D orthocam (knight squad)
+Bomb snap to square
+Power ups : Bomb#, Range+, Boots/Speed, Mount, 
+Curse : Invert speed, loose powers, slow down, timer death, 
+Game modes : Deathmatch, Graal/Trophé, Dodgeball, 
+
+Round bomb
+Put bricks down as a role bomber as another role, switch roles.
+Windjammers
+Objectives/CTF that moves with brick laying
+Base building phase vs attack phase
+Bots (low priority)
+Different characters with different powers
+Escort quest
+Simetrical payload, own the zone (tug the rope)
+Directional bombs
+Kick the bomb
+Teleport power
+Pass through walls
+Mutant chronicles pve style
+Hot potato
+Ricochet/Reflective walls/bomb
+Tiles that teleport bombs fire
+Shield (slow, can't place bomb, etc)
+Kick/move bombs far away (chest style displacement)
+Invisible character except when attacking or walking through water (show steps marks)
+Boss mode solo and/or pve (story mode?)
+Ghost mode
+Flyer mode + Bomber mode team vs
+
+https://beta.unity3d.com/download/ed1bf90b40e6/public_download.html
