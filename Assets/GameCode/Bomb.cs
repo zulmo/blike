@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Bomb : MonoBehaviour
+public class Bomb : MonoBehaviour, TileContent
 {
     [SerializeField]
     private float Timer;
@@ -8,14 +8,32 @@ public class Bomb : MonoBehaviour
     [SerializeField]
     private int Range;
 
+    public Vector2Int Coords { get; private set; }
+
     private float Elapsed = 0;
 
-	void Update ()
+    public void Initialize(Vector2Int coords)
+    {
+        Coords = coords;
+    }
+
+    private void Update ()
     {
         Elapsed += Time.deltaTime;
         if(Elapsed > Timer)
         {
-            GameFacade.BombExploded.Invoke(this);
+            Explode();
         }
 	}
+
+    public void Explode()
+    {
+        GameFacade.BombExploded.Invoke(this);
+    }
+
+    // TileContent interface
+    public TileContentType GetContentType()
+    {
+        return TileContentType.Bomb;
+    }
 }
