@@ -17,6 +17,9 @@ public class BlikeGame : MonoBehaviour
     [SerializeField]
     private Bomb _bombPrefab;
 
+    [SerializeField]
+    private PlayerController[] _players;
+
     public void Awake()
     {
         for (int i = 0; i < NB_COLUMNS; ++i)
@@ -25,6 +28,11 @@ public class BlikeGame : MonoBehaviour
             {
                 _tiles[i, j] = new Tile(i, j);
             }
+        }
+
+        for(int i = 0, count = _players.Length; i < count; ++i)
+        {
+            _players[i].PlayerIndex = i + 1;
         }
 
         UpdateTilesWithContent<Wall>(_terrain, null);
