@@ -1,8 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-public class BlikeGame : MonoBehaviour 
+public class BlikeGame : MonoBehaviour
 {
+    public static int MAX_PLAYERS = 8;
+
     private static int NB_COLUMNS = 11;
     private static int NB_ROWS = 11;
 
@@ -19,7 +21,7 @@ public class BlikeGame : MonoBehaviour
 
     [SerializeField]
     private PlayerController[] _players;
-
+    
     public void Awake()
     {
         for (int i = 0; i < NB_COLUMNS; ++i)
@@ -32,7 +34,8 @@ public class BlikeGame : MonoBehaviour
 
         for(int i = 0, count = _players.Length; i < count; ++i)
         {
-            _players[i].PlayerIndex = i + 1;
+            var player = _players[i];
+            player.PlayerIndex = i + 1;
         }
 
         UpdateTilesWithContent<Wall>(_terrain, null);
