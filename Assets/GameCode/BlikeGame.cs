@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BlikeGame : MonoBehaviour
@@ -20,7 +21,12 @@ public class BlikeGame : MonoBehaviour
     private Bomb _bombPrefab;
 
     [SerializeField]
-    private PlayerController[] _players;
+    private PlayerController _playerPrefab;
+
+    [SerializeField]
+    private Transform[] _spawnPoints;
+
+    private List<PlayerController> _players;
     
     public void Awake()
     {
@@ -32,10 +38,32 @@ public class BlikeGame : MonoBehaviour
             }
         }
 
-        for(int i = 0, count = _players.Length; i < count; ++i)
+        var playerModels = ApplicationModels.GetModel<GameModel>().Players;
+        int playersCount = playerModels.Count;
+
+        var nbSpawns = Math.Min(_spawnPoints.Length, playersCount);
+        var spawnPoints = new Vector3[nbSpawns];
+        for (int i = 0; i < nbSpawns; ++i)
         {
-            var player = _players[i];
-            player.PlayerIndex = i + 1;
+            spawnPoints[i] = GetTileCenter(GetTile(_spawnPoints[i].position));
+        }
+        spawnPoints.Shuffle();
+        
+        _players = new List<PlayerController>(playerModels.Count);
+        for (int i = 0; i < playersCount; ++i)
+        {
+            var model = playerModels[i];
+
+            var controller = Instantiate(_playerPrefab, _groundMesh.transform);
+            var position = spawnPoints[i];
+            position.y += 0.5f*controller.CharacterController.height*controller.transform.localScale.y;
+            controller.transform.position = position;
+            controller.JoystickNumber = model.JoystickNumber;
+
+            var playerView = controller.GetComponent<PlayerView>();
+            playerView.Initialize(model.Color);
+
+            _players.Add(controller);
         }
 
         UpdateTilesWithContent<Wall>(_terrain, null);
@@ -90,6 +118,17 @@ public class BlikeGame : MonoBehaviour
         var tileX = (int)Math.Min(NB_COLUMNS - 1, Math.Max(0, posDiff.x / tileSizeX));
         var tileY = (int)Math.Min(NB_ROWS - 1, Math.Max(0, posDiff.z / tileSizeZ));
         return _tiles[tileX, tileY];
+    }
+
+    private Vector3 GetTileCenter(Tile tile)
+    {
+        var bounds = _groundMesh.bounds;
+        var tileSizeX = bounds.size.x / NB_COLUMNS;
+        var tileSizeZ = bounds.size.z / NB_ROWS;
+        var position = bounds.min;
+        position.x += (tile.Coords.x + 0.5f) * tileSizeX;
+        position.z += (tile.Coords.y + 0.5f) * tileSizeZ;
+        return position;
     }
 
     private void OnBombExploded(Bomb bomb)

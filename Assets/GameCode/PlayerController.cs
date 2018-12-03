@@ -9,17 +9,22 @@ public class PlayerController : MonoBehaviour, TileContent
     [SerializeField]
     private CharacterController _controller;
 
-    private int _playerIndex;
-    public int PlayerIndex
+    public CharacterController CharacterController
+    {
+        get { return _controller; }
+    }
+
+    private int _joystickNumber;
+    public int JoystickNumber
     {
         get
         {
-            return _playerIndex;
+            return _joystickNumber;
         }
 
         set
         {
-            _playerIndex = value;
+            _joystickNumber = value;
             SetupAxes();
         }
     }
@@ -29,12 +34,12 @@ public class PlayerController : MonoBehaviour, TileContent
     private string _horizontalAxis;
     private string _verticalAxis;
     private string _actionButton;
-    
+
     private void SetupAxes()
     {
-        _horizontalAxis = string.Format("Player{0}_Horizontal", PlayerIndex);
-        _verticalAxis = string.Format("Player{0}_Vertical", PlayerIndex);
-        _actionButton = string.Format("Player{0}_Action", PlayerIndex);
+        _horizontalAxis = string.Format("Player{0}_Horizontal", JoystickNumber);
+        _verticalAxis = string.Format("Player{0}_Vertical", JoystickNumber);
+        _actionButton = string.Format("Player{0}_Action", JoystickNumber);
     }
 
     void FixedUpdate ()

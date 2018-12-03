@@ -24,16 +24,16 @@ public class MenuController : MonoBehaviour
         {
             if (Input.GetButtonUp(ActionButtons[i]))
             {
-                MenuFacade.PlayerJoined.Invoke(i);
+                MenuFacade.PlayerJoined.Invoke(i+1);
             }
 
             if (playerStartIndex < 0 && Input.GetButtonUp(StartButtons[i]))
             {
-                playerStartIndex = i;
+                playerStartIndex = i+1;
             }
         }
 
-        if (playerStartIndex >= 0)
+        if (playerStartIndex > 0)
         {
             MenuFacade.PlayerStarted.Invoke(playerStartIndex);
         }

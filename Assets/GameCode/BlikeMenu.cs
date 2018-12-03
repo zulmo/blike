@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BlikeMenu : MonoBehaviour
@@ -39,16 +40,31 @@ public class BlikeMenu : MonoBehaviour
         MenuFacade.PlayerStarted.Disconnect(OnPlayerStarted);
     }
 
-    private void OnPlayerJoined(int playerIndex)
+    private void OnPlayerJoined(int joystickNumber)
     {
-        int playerOrder = playerIndex;
-        _playersItem[playerOrder].Open(playerIndex, PlayerColors[playerOrder]);
-        _startMessage.gameObject.SetActive(true);
-        _joinMessage.gameObject.SetActive(playerOrder != BlikeGame.MAX_PLAYERS - 1);
+        var gameModel = ApplicationModels.GetModel<GameModel>();
+        if(gameModel.Players.Find(player => player.JoystickNumber == joystickNumber) == null)
+        {
+            int playerOrder = gameModel.Players.Count;
+            var color = PlayerColors[playerOrder];
+
+            _playersItem[playerOrder].Open(playerOrder, color);
+            gameModel.AddPlayer(joystickNumber, color);
+
+            _startMessage.gameObject.SetActive(true);
+            _joinMessage.gameObject.SetActive(playerOrder != BlikeGame.MAX_PLAYERS - 1);
+        }
     }
 
-    private void OnPlayerStarted(int playerIndex)
+    private void OnPlayerStarted(int joystickNumber)
     {
-        Debug.Log(string.Format("Game started by player {0}", playerIndex));
+        var gameModel = ApplicationModels.GetModel<GameModel>();
+        var startPlayer = gameModel.Players.FindIndex(player => player.JoystickNumber == joystickNumber);
+        if(startPlayer >= 0)
+        {
+            Debug.Log(string.Format("Game started by player {0} (joystick {1})", startPlayer + 1, joystickNumber));
+        }
+
+        SceneManager.LoadScene("Scenes/TestLevel", LoadSceneMode.Single);
     }
 }
