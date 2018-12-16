@@ -2,7 +2,7 @@
 
 public static class Startup
 {
-    [RuntimeInitializeOnLoadMethod]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
         ApplicationModels.Initialize();

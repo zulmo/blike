@@ -3,38 +3,38 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // Taken from https://answers.unity.com/questions/441246/editor-script-to-make-play-always-jump-to-a-start.html
-public static class PlayFromTheFirstScene
+public static class PlayFromFirstScene
 {
-    const string playFromFirstMenuStr = "Edit/Always Start From Scene 0";
+    private const string PlayFromFirstSceneStr = "Edit/Always Start From Scene 0";
 
-    static bool playFromFirstScene
+    public static bool Enabled
     {
-        get { return EditorPrefs.HasKey(playFromFirstMenuStr) && EditorPrefs.GetBool(playFromFirstMenuStr); }
-        set { EditorPrefs.SetBool(playFromFirstMenuStr, value); }
+        get { return EditorPrefs.HasKey(PlayFromFirstSceneStr) && EditorPrefs.GetBool(PlayFromFirstSceneStr); }
+        set { EditorPrefs.SetBool(PlayFromFirstSceneStr, value); }
     }
 
-    [MenuItem(playFromFirstMenuStr, false, 150)]
-    static void PlayFromFirstSceneCheckMenu()
+    [MenuItem(PlayFromFirstSceneStr, false, 150)]
+    private static void PlayFromFirstSceneCheckMenu()
     {
-        playFromFirstScene = !playFromFirstScene;
-        Menu.SetChecked(playFromFirstMenuStr, playFromFirstScene);
+        Enabled = !Enabled;
+        Menu.SetChecked(PlayFromFirstSceneStr, Enabled);
 
-        ShowNotifyOrLog(playFromFirstScene ? "Play from scene 0" : "Play from current scene");
+        ShowNotifyOrLog(Enabled ? "Play from scene 0" : "Play from current scene");
     }
 
     // The menu won't be gray out, we use this validate method for update check state
-    [MenuItem(playFromFirstMenuStr, true)]
-    static bool PlayFromFirstSceneCheckMenuValidate()
+    [MenuItem(PlayFromFirstSceneStr, true)]
+    private static bool PlayFromFirstSceneCheckMenuValidate()
     {
-        Menu.SetChecked(playFromFirstMenuStr, playFromFirstScene);
+        Menu.SetChecked(PlayFromFirstSceneStr, Enabled);
         return true;
     }
 
     // This method is called before any Awake. It's the perfect callback for this feature
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void LoadFirstSceneAtGameBegins()
+    private static void LoadFirstSceneAtGameBegins()
     {
-        if (!playFromFirstScene)
+        if (!Enabled)
         {
             return;
         }
@@ -45,15 +45,10 @@ public static class PlayFromTheFirstScene
             return;
         }
 
-        foreach (GameObject go in Object.FindObjectsOfType<GameObject>())
-        {
-            go.SetActive(false);
-        }
-
         SceneManager.LoadScene(0);
     }
 
-    static void ShowNotifyOrLog(string msg)
+    private static void ShowNotifyOrLog(string msg)
     {
         if (Resources.FindObjectsOfTypeAll<SceneView>().Length > 0)
         {
