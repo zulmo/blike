@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63e4ab8e769427748af0670c5e7ccdeb, type: 3}
   m_Name: PlayerColors
   m_EditorClassIdentifier: 
-  Material: {fileID: 0}
+  Material: {fileID: 2100000, guid: de9fee656d01e4545b9b65b5075a68e4, type: 2}
   Colors:
   - {r: 0, g: 0, b: 1, a: 0}
   - {r: 1, g: 0, b: 0, a: 0}

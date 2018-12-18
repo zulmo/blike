@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 public class BlikeMenu : MonoBehaviour
 {
-    //TODO: Read from Scriptable Object
-    public static Color[] PlayerColors = new Color[] { Color.blue, Color.red, Color.green, Color.yellow, Color.black, Color.cyan, Color.magenta, Color.grey };
-
     [SerializeField]
     private GameObject _playersGrid;
 
@@ -46,7 +43,7 @@ public class BlikeMenu : MonoBehaviour
         if(gameModel.Players.Find(player => player.JoystickNumber == joystickNumber) == null)
         {
             int playerOrder = gameModel.Players.Count;
-            var color = PlayerColors[playerOrder];
+            var color = ScriptableObjectsDatabase.PlayerColors.Colors[playerOrder];
 
             _playersItem[playerOrder].Open(playerOrder, color);
             gameModel.AddPlayer(joystickNumber, color);

@@ -37,7 +37,7 @@ public class TestBattleInitializer : MonoBehaviour
         var model = ApplicationModels.GetModel<GameModel>();
         for(int i = 0; i < TestData.NbPlayers; ++i)
         {
-            model.AddPlayer(i+1, BlikeMenu.PlayerColors[i]);
+            model.AddPlayer(i+1, ScriptableObjectsDatabase.PlayerColors.Colors[i]);
         }
 
         SceneManager.LoadScene(TestData.ScenePath, LoadSceneMode.Single);

@@ -6,5 +6,6 @@ public static class Startup
     private static void Initialize()
     {
         ApplicationModels.Initialize();
+        ScriptableObjectsDatabase.Initialize();
     }
 }
