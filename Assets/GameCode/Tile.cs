@@ -17,6 +17,16 @@ public class Tile
         get { return HasContentType(TileContentType.Wall); }
     }
 
+    public bool IsDestructibleBlock
+    {
+        get { return HasContentType(TileContentType.DestructibleBlock); }
+    }
+
+    public DestructibleBlock DestructibleBlock
+    {
+        get { return (DestructibleBlock)GetContent(TileContentType.DestructibleBlock); }
+    }
+
     public bool HasBomb
     {
         get { return HasContentType(TileContentType.Bomb); }

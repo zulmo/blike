@@ -1,6 +1,7 @@
 ﻿public enum TileContentType
 {
     Wall,
+    DestructibleBlock,
     Player,
     Bomb
 }

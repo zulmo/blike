@@ -18,6 +18,9 @@ public class BlikeGame : MonoBehaviour
     private MeshRenderer _groundMesh;
 
     [SerializeField]
+    private DestructibleBlock _destructibleBlockPrefab;
+
+    [SerializeField]
     private Bomb _bombPrefab;
 
     [SerializeField]
@@ -27,6 +30,12 @@ public class BlikeGame : MonoBehaviour
     private Transform[] _spawnPoints;
 
     private List<PlayerController> _players;
+
+    private struct SpawnPoint
+    {
+        public Vector3 Position;
+        public Tile Tile;
+    }
     
     public void Awake()
     {
@@ -42,10 +51,12 @@ public class BlikeGame : MonoBehaviour
         int playersCount = playerModels.Count;
 
         var nbSpawns = Math.Min(_spawnPoints.Length, playersCount);
-        var spawnPoints = new Vector3[nbSpawns];
+        var spawnPoints = new SpawnPoint[nbSpawns];
         for (int i = 0; i < nbSpawns; ++i)
         {
-            spawnPoints[i] = GetTileCenter(GetTile(_spawnPoints[i].position));
+            var tile = GetTile(_spawnPoints[i].position);
+            spawnPoints[i].Tile = tile;
+            spawnPoints[i].Position = GetTileCenter(tile);
         }
         spawnPoints.Shuffle();
         
@@ -55,19 +66,37 @@ public class BlikeGame : MonoBehaviour
             var model = playerModels[i];
 
             var controller = Instantiate(_playerPrefab, _groundMesh.transform);
-            var position = spawnPoints[i];
+            var spawn = spawnPoints[i];
+            var position = spawn.Position;
             position.y += 0.5f*controller.CharacterController.height*controller.transform.localScale.y;
             controller.transform.position = position;
             controller.JoystickNumber = model.JoystickNumber;
+            controller.Coords = spawn.Tile.Coords;
 
             var playerView = controller.GetComponent<PlayerView>();
             playerView.Initialize(model.Color);
 
             _players.Add(controller);
+            spawn.Tile.Content.Add(controller);
         }
 
         UpdateTilesWithContent<Wall>(_terrain, null);
-        UpdateTilesWithContent<PlayerController>(gameObject, (controller, tile) => controller.Coords = tile.Coords);
+
+        for (int i = 0; i < NB_COLUMNS; ++i)
+        {
+            for (int j = 0; j < NB_ROWS; ++j)
+            {
+                var tile = _tiles[i, j];
+                if (tile.IsEmpty)
+                {
+                    var block = Instantiate(_destructibleBlockPrefab, _groundMesh.transform);
+                    var position = GetTileCenter(tile);
+                    position.y += 0.5f * block.BoxCollider.size.y * block.transform.localScale.y;
+                    block.transform.position = position;
+                    tile.Content.Add(block);
+                }
+            }
+        }
 
         GameFacade.PlayerMoved.Connect(OnPlayerMoved);
         GameFacade.BombExploded.Connect(OnBombExploded);
@@ -166,9 +195,18 @@ public class BlikeGame : MonoBehaviour
                     {
                         canPropagate = false;
                     }
+                    else if (tile.IsDestructibleBlock)
+                    {
+                        var block = tile.DestructibleBlock;
+                        tile.Content.Remove(block);
+                        Destroy(block.gameObject);
+                        // TODO: Spawn bonus
+
+                        canPropagate = false; // TODO: Depends on the player's bonus (spiked bomb?)
+                    }
                     else
                     {
-                        // TODO: determine if the explosion propagates when it hits a player of a bomb.
+                        // TODO: determine if the explosion propagates when it hits a player or a bomb.
                         // For the moment, let's say yes
                         var bomb = tile.Bomb;
                         if (bomb)
