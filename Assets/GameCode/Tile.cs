@@ -7,9 +7,15 @@ public class Tile
 
     public List<TileContent> Content { get; private set; }
     
-    public bool IsEmpty
+    public bool IsEmpty(int ignoreFlags = 0)
     {
-        get { return Content.Count == 0; }
+        return Content.TrueForAll(item => IsContentEmpty(item, ignoreFlags));
+    }
+
+    private bool IsContentEmpty(TileContent item, int ignoreFlags)
+    {
+        var contentFlag = 1 << (int)item.GetContentType();
+        return (contentFlag & ignoreFlags) != 0;
     }
 
     public bool IsWall

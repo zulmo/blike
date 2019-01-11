@@ -3,7 +3,8 @@
     Wall,
     DestructibleBlock,
     Player,
-    Bomb
+    Bomb,
+    SpawnArea
 }
 
 public interface TileContent

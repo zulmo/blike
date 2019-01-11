@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class BlikeGame : MonoBehaviour
@@ -50,6 +51,8 @@ public class BlikeGame : MonoBehaviour
         var playerModels = ApplicationModels.GetModel<GameModel>().Players;
         int playersCount = playerModels.Count;
 
+        UpdateTilesWithContent<Wall>(_terrain, null);
+
         var nbSpawns = Math.Min(_spawnPoints.Length, playersCount);
         var spawnPoints = new SpawnPoint[nbSpawns];
         for (int i = 0; i < nbSpawns; ++i)
@@ -57,6 +60,25 @@ public class BlikeGame : MonoBehaviour
             var tile = GetTile(_spawnPoints[i].position);
             spawnPoints[i].Tile = tile;
             spawnPoints[i].Position = GetTileCenter(tile);
+
+            // Flag all nearby tiles as SpawnArea to avoid spawning blocks on them
+            var coords = tile.Coords;
+            for (int offsetX = -1; offsetX <= 1; ++offsetX)
+            {
+                for (int offsetY = -1; offsetY <= 1; ++offsetY)
+                {
+                    var x = coords.x + offsetX;
+                    var y = coords.y + offsetY;
+                    if(x >= 0 && x < NB_COLUMNS && y >= 0 && y < NB_ROWS)
+                    {
+                        var areaTile = _tiles[x, y];
+                        if (!areaTile.IsWall)
+                        {
+                            areaTile.Content.Add(SpawnArea.Instance);
+                        }
+                    }
+                }
+            }
         }
         spawnPoints.Shuffle();
         
@@ -79,15 +101,13 @@ public class BlikeGame : MonoBehaviour
             _players.Add(controller);
             spawn.Tile.Content.Add(controller);
         }
-
-        UpdateTilesWithContent<Wall>(_terrain, null);
-
+        
         for (int i = 0; i < NB_COLUMNS; ++i)
         {
             for (int j = 0; j < NB_ROWS; ++j)
             {
                 var tile = _tiles[i, j];
-                if (tile.IsEmpty)
+                if (tile.IsEmpty()) // No ignore flags => tile must be completely empty to receive a block (spawn areas stay empty)
                 {
                     var block = Instantiate(_destructibleBlockPrefab, _groundMesh.transform);
                     var position = GetTileCenter(tile);
@@ -180,6 +200,10 @@ public class BlikeGame : MonoBehaviour
         var currentDistance = 0;
         var coords = initialCoords;
         bool canPropagate = true;
+
+        // Tiles containing only Spawn Areas are considered empty when it comes to explosions
+        var contentIgnoreFlags = 1 << (int)TileContentType.SpawnArea;
+
         do
         {
             coords.x += diffX;
@@ -189,7 +213,7 @@ public class BlikeGame : MonoBehaviour
             if(canPropagate)
             {
                 var tile = _tiles[coords.x, coords.y];
-                if(!tile.IsEmpty)
+                if(!tile.IsEmpty(contentIgnoreFlags))
                 {
                     if(tile.IsWall)
                     {
@@ -214,15 +238,37 @@ public class BlikeGame : MonoBehaviour
                             bomb.Explode();
                         }
 
+                        // Kill players hit by the bomb
                         var players = tile.Players;
                         if (players != null)
                         {
                             for (int i = 0, count = players.Count; i < count; ++i)
                             {
-                                // TODO: Damage player
-                                Debug.Log("Player hit");
+                                var player = players[i];
+                                player.gameObject.SetActive(false);
+                                tile.Content.Remove(player);
                             }
-                        }
+
+                            var activePlayers = _players.FindAll(controller => controller.gameObject.activeInHierarchy);
+                            var nbActivePlayers = activePlayers.Count;
+                            if (nbActivePlayers <= 1)
+                            {
+                                if (nbActivePlayers == 1)
+                                {
+                                    Debug.Log(string.Format("Player {0} wins!", _players.FindIndex(o => o == activePlayers[0]) + 1));
+                                }
+                                else if (nbActivePlayers == 0)
+                                {
+                                    Debug.Log("Draw");
+                                }
+
+#if UNITY_EDITOR
+                                EditorApplication.isPlaying = false;
+#else
+                                Application.Quit();
+#endif
+                            }
+                        }                        
                     }
                 }
             }
