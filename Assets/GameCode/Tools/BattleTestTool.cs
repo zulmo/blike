@@ -24,7 +24,8 @@ public class BattleTestTool : EditorWindow
         }
 
         _data.NbPlayers = EditorGUILayout.IntField("Nb players", _data.NbPlayers);
-        if(EditorApplication.isPlaying)
+        _data.UseKeyboard = EditorGUILayout.Toggle("Use keyboard", _data.UseKeyboard);
+        if (EditorApplication.isPlaying)
         {
             if (GUILayout.Button("Stop Battle"))
             {

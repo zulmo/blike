@@ -16,6 +16,14 @@ public class TestBattleInitializer : MonoBehaviour
         }
 
         [SerializeField]
+        private bool _useKeyboard = true;
+        public bool UseKeyboard
+        {
+            get { return _useKeyboard; }
+            set { _useKeyboard = value; }
+        }
+
+        [SerializeField]
         private string _scenePath;
         public string ScenePath
         {
@@ -35,9 +43,10 @@ public class TestBattleInitializer : MonoBehaviour
     private void Awake()
     {
         var model = ApplicationModels.GetModel<GameModel>();
+        var joystickOffset = TestData.UseKeyboard ? 0 : 1;
         for(int i = 0; i < TestData.NbPlayers; ++i)
         {
-            model.AddPlayer(i+1, ScriptableObjectsDatabase.PlayerColors.Colors[i]);
+            model.AddPlayer(i + joystickOffset, ScriptableObjectsDatabase.PlayerColors.Colors[i]);
         }
 
         SceneManager.LoadScene(TestData.ScenePath, LoadSceneMode.Single);
