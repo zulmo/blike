@@ -193,6 +193,27 @@ public class BlikeGame : MonoBehaviour
         PropagateExplosion(coords, 1, 0, range);
         PropagateExplosion(coords, 0, -1, range);
         PropagateExplosion(coords, 0, 1, range);
+
+        // Check remaining players
+        var activePlayers = _players.FindAll(controller => controller.gameObject.activeInHierarchy);
+        var nbActivePlayers = activePlayers.Count;
+        if (nbActivePlayers <= 1)
+        {
+            if (nbActivePlayers == 1)
+            {
+                Debug.Log(string.Format("Player {0} wins!", _players.FindIndex(o => o == activePlayers[0]) + 1));
+            }
+            else if (nbActivePlayers == 0)
+            {
+                Debug.Log("Draw");
+            }
+
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
     }
 
     private void PropagateExplosion(Vector2Int initialCoords, int diffX, int diffY, int range)
@@ -247,26 +268,6 @@ public class BlikeGame : MonoBehaviour
                                 var player = players[i];
                                 player.gameObject.SetActive(false);
                                 tile.Content.Remove(player);
-                            }
-
-                            var activePlayers = _players.FindAll(controller => controller.gameObject.activeInHierarchy);
-                            var nbActivePlayers = activePlayers.Count;
-                            if (nbActivePlayers <= 1)
-                            {
-                                if (nbActivePlayers == 1)
-                                {
-                                    Debug.Log(string.Format("Player {0} wins!", _players.FindIndex(o => o == activePlayers[0]) + 1));
-                                }
-                                else if (nbActivePlayers == 0)
-                                {
-                                    Debug.Log("Draw");
-                                }
-
-#if UNITY_EDITOR
-                                EditorApplication.isPlaying = false;
-#else
-                                Application.Quit();
-#endif
                             }
                         }                        
                     }
