@@ -8,12 +8,15 @@ public class Bomb : MonoBehaviour, TileContent
     [SerializeField]
     private int Range;
 
+    public PlayerModel Owner { get; private set; }
+
     public Vector2Int Coords { get; private set; }
 
     private float Elapsed = 0;
 
-    public void Initialize(Vector2Int coords)
+    public void Initialize(PlayerModel owner, Vector2Int coords)
     {
+        Owner = owner;
         Coords = coords;
     }
 

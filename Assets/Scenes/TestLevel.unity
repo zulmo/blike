@@ -1889,6 +1889,59 @@ Transform:
   m_Father: {fileID: 490420312}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1352470252
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4716202812871448, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 223097359454601180, guid: 01974edd35056d84297febf94d85b06f,
+        type: 2}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 282840813}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+  m_IsPrefabParent: 0
+--- !u!114 &1352470253 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114257979609144032, guid: 01974edd35056d84297febf94d85b06f,
+    type: 2}
+  m_PrefabInternal: {fileID: 1352470252}
+  m_Script: {fileID: 11500000, guid: 7c46786e7ce79974480874ac243a2c1b, type: 3}
 --- !u!1 &1377093127
 GameObject:
   m_ObjectHideFlags: 0
@@ -3077,6 +3130,7 @@ MonoBehaviour:
     type: 2}
   _bombPrefab: {fileID: 114890869152658930, guid: 89dc1f95b9cb7124a8a778c2b62089b9,
     type: 2}
+  _view: {fileID: 1352470253}
   _playerPrefab: {fileID: 114348374537660974, guid: c2f149ee416bdba44b299d79a440db2f,
     type: 2}
   _spawnPoints:

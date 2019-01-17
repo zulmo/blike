@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class BlikeGame : MonoBehaviour
@@ -25,6 +24,9 @@ public class BlikeGame : MonoBehaviour
     private Bomb _bombPrefab;
 
     [SerializeField]
+    private LastOneStandingView _view;
+
+    [SerializeField]
     private PlayerController _playerPrefab;
 
     [SerializeField]
@@ -40,6 +42,10 @@ public class BlikeGame : MonoBehaviour
     
     public void Awake()
     {
+        ApplicationModels.RegisterModel<BattleModel>(new BattleModel());
+
+        _view.Initialize();
+
         for (int i = 0; i < NB_COLUMNS; ++i)
         {
             for (int j = 0; j < NB_ROWS; ++j)
@@ -92,8 +98,7 @@ public class BlikeGame : MonoBehaviour
             var position = spawn.Position;
             position.y += 0.5f*controller.CharacterController.height*controller.transform.localScale.y;
             controller.transform.position = position;
-            controller.JoystickNumber = model.JoystickNumber;
-            controller.Coords = spawn.Tile.Coords;
+            controller.Initialize(model, spawn.Tile.Coords);
 
             var playerView = controller.GetComponent<PlayerView>();
             playerView.Initialize(model.Color);
@@ -138,9 +143,13 @@ public class BlikeGame : MonoBehaviour
 
     public void OnDestroy()
     {
+        _view.Deinitialize();
+
         GameFacade.PlayerMoved.Disconnect(OnPlayerMoved);
         GameFacade.BombExploded.Disconnect(OnBombExploded);
         GameFacade.BombInputPressed.Disconnect(OnBombInputPressed);
+
+        ApplicationModels.UnregisterModel<BattleModel>();
     }
 
     private void UpdateTilesWithContent<TContent>(GameObject parent, Action<TContent, Tile> initializeAction) where TContent : MonoBehaviour, TileContent
@@ -189,37 +198,25 @@ public class BlikeGame : MonoBehaviour
 
         // TODO: Range should evolve with the player's bonuses
         var range = 3;
-        PropagateExplosion(coords, -1, 0, range);
-        PropagateExplosion(coords, 1, 0, range);
-        PropagateExplosion(coords, 0, -1, range);
-        PropagateExplosion(coords, 0, 1, range);
+        PropagateExplosion(bomb, -1, 0, range);
+        PropagateExplosion(bomb, 1, 0, range);
+        PropagateExplosion(bomb, 0, -1, range);
+        PropagateExplosion(bomb, 0, 1, range);
 
         // Check remaining players
         var activePlayers = _players.FindAll(controller => controller.gameObject.activeInHierarchy);
         var nbActivePlayers = activePlayers.Count;
         if (nbActivePlayers <= 1)
         {
-            if (nbActivePlayers == 1)
-            {
-                Debug.Log(string.Format("Player {0} wins!", _players.FindIndex(o => o == activePlayers[0]) + 1));
-            }
-            else if (nbActivePlayers == 0)
-            {
-                Debug.Log("Draw");
-            }
-
-#if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            int winnerIndex = nbActivePlayers == 0 ? -1 : _players.FindIndex(o => o == activePlayers[0]);
+            GameFacade.GameOver.Invoke(winnerIndex);
         }
     }
 
-    private void PropagateExplosion(Vector2Int initialCoords, int diffX, int diffY, int range)
+    private void PropagateExplosion(Bomb bomb, int diffX, int diffY, int range)
     {
         var currentDistance = 0;
-        var coords = initialCoords;
+        var coords = bomb.Coords;
         bool canPropagate = true;
 
         // Tiles containing only Spawn Areas are considered empty when it comes to explosions
@@ -253,21 +250,31 @@ public class BlikeGame : MonoBehaviour
                     {
                         // TODO: determine if the explosion propagates when it hits a player or a bomb.
                         // For the moment, let's say yes
-                        var bomb = tile.Bomb;
-                        if (bomb)
+                        var tileBomb = tile.Bomb;
+                        if (tileBomb)
                         {
-                            bomb.Explode();
+                            tileBomb.Explode();
                         }
 
                         // Kill players hit by the bomb
                         var players = tile.Players;
                         if (players != null)
                         {
+                            var battleModels = ApplicationModels.GetModel<BattleModel>().Players;
                             for (int i = 0, count = players.Count; i < count; ++i)
                             {
                                 var player = players[i];
+                                if(bomb.Owner != player.Owner)
+                                {
+                                    var killer = battleModels.Find(p => p.PlayerModel == bomb.Owner);
+                                    ++killer.Score;
+                                }
                                 player.gameObject.SetActive(false);
                                 tile.Content.Remove(player);
+
+
+                                var victim = battleModels.Find(p => p.PlayerModel == player.Owner);
+                                victim.Events.Eliminated.Invoke();
                             }
                         }                        
                     }
@@ -277,13 +284,14 @@ public class BlikeGame : MonoBehaviour
         while (canPropagate);
     }
 
-    private void OnBombInputPressed(Vector3 position)
+    private void OnBombInputPressed(PlayerController player)
     {
+        var position = player.transform.position;
         var tile = GetTile(position);
         if(tile != null && !tile.HasBomb)
         {
             var bomb = Instantiate(_bombPrefab, position, Quaternion.identity, _groundMesh.transform);
-            bomb.Initialize(tile.Coords);
+            bomb.Initialize(player.Owner, tile.Coords);
             tile.Content.Add(bomb);
         }
     }

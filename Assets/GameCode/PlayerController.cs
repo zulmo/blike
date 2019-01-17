@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 // https://docs.unity3d.com/ScriptReference/CharacterController.Move.html
 public class PlayerController : MonoBehaviour, TileContent
@@ -14,20 +15,7 @@ public class PlayerController : MonoBehaviour, TileContent
         get { return _controller; }
     }
 
-    private int _joystickNumber;
-    public int JoystickNumber
-    {
-        get
-        {
-            return _joystickNumber;
-        }
-
-        set
-        {
-            _joystickNumber = value;
-            SetupAxes();
-        }
-    }
+    public PlayerModel Owner { get; private set; }
 
     public Vector2Int Coords { get; set; }
 
@@ -35,11 +23,16 @@ public class PlayerController : MonoBehaviour, TileContent
     private string _verticalAxis;
     private string _actionButton;
 
-    private void SetupAxes()
+
+    public void Initialize(PlayerModel owner, Vector2Int coords)
     {
-        _horizontalAxis = string.Format("Player{0}_Horizontal", JoystickNumber);
-        _verticalAxis = string.Format("Player{0}_Vertical", JoystickNumber);
-        _actionButton = string.Format("Player{0}_Action", JoystickNumber);
+        Owner = owner;
+        Coords = coords;
+
+        var joystick = owner.JoystickNumber;
+        _horizontalAxis = string.Format("Player{0}_Horizontal", joystick);
+        _verticalAxis = string.Format("Player{0}_Vertical", joystick);
+        _actionButton = string.Format("Player{0}_Action", joystick);
     }
 
     void FixedUpdate ()
@@ -56,7 +49,7 @@ public class PlayerController : MonoBehaviour, TileContent
 
         if(Input.GetButtonUp(_actionButton))
         {
-            GameFacade.BombInputPressed.Invoke(transform.position);
+            GameFacade.BombInputPressed.Invoke(this);
         }
 	}
 
