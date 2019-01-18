@@ -19,15 +19,16 @@ public class PlayerController : MonoBehaviour, TileContent
 
     public Vector2Int Coords { get; set; }
 
+    public bool InputBlocked { get; set; }
+
     private string _horizontalAxis;
     private string _verticalAxis;
     private string _actionButton;
 
 
-    public void Initialize(PlayerModel owner, Vector2Int coords)
+    public void Initialize(PlayerModel owner)
     {
         Owner = owner;
-        Coords = coords;
 
         var joystick = owner.JoystickNumber;
         _horizontalAxis = string.Format("Player{0}_Horizontal", joystick);
@@ -37,19 +38,22 @@ public class PlayerController : MonoBehaviour, TileContent
 
     void FixedUpdate ()
     {
-        // We need to use GetAxisRaw instead of GetAxis because the latter smooths the values, resulting in an unwanted inertia when using the keyboard
-        Vector3 moveDirection = new Vector3(Input.GetAxisRaw(_horizontalAxis), 0, Input.GetAxisRaw(_verticalAxis));
-        moveDirection = transform.TransformDirection(moveDirection);
-        if(!Mathf.Approximately(0f, moveDirection.magnitude))
+        if(!InputBlocked)
         {
-            moveDirection *= _speed;
-            _controller.Move(moveDirection * Time.deltaTime);
-            GameFacade.PlayerMoved.Invoke(this);
-        }
+            // We need to use GetAxisRaw instead of GetAxis because the latter smooths the values, resulting in an unwanted inertia when using the keyboard
+            Vector3 moveDirection = new Vector3(Input.GetAxisRaw(_horizontalAxis), 0, Input.GetAxisRaw(_verticalAxis));
+            moveDirection = transform.TransformDirection(moveDirection);
+            if (!Mathf.Approximately(0f, moveDirection.magnitude))
+            {
+                moveDirection *= _speed;
+                _controller.Move(moveDirection * Time.deltaTime);
+                GameFacade.PlayerMoved.Invoke(this);
+            }
 
-        if(Input.GetButtonUp(_actionButton))
-        {
-            GameFacade.BombInputPressed.Invoke(this);
+            if (Input.GetButtonUp(_actionButton))
+            {
+                GameFacade.BombInputPressed.Invoke(this);
+            }
         }
 	}
 

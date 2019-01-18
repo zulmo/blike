@@ -28,8 +28,8 @@ public class PlayerScoreUI : MonoBehaviour
         SetScore(_battleModel.Score);
 
         _playerColor.color = _battleModel.PlayerModel.Color;
-
-        _grayFilter.gameObject.SetActive(false);
+        
+        GameFacade.RoundStart.Connect(OnRoundStart);
     }
 
     public void Deinitialize()
@@ -46,5 +46,9 @@ public class PlayerScoreUI : MonoBehaviour
     {
         _grayFilter.gameObject.SetActive(true);
     }
-
+    
+    private void OnRoundStart()
+    {
+        _grayFilter.gameObject.SetActive(false);
+    }
 }

@@ -3133,7 +3133,7 @@ MonoBehaviour:
   _view: {fileID: 1352470253}
   _playerPrefab: {fileID: 114348374537660974, guid: c2f149ee416bdba44b299d79a440db2f,
     type: 2}
-  _spawnPoints:
+  _spawnPointPositions:
   - {fileID: 499573885}
   - {fileID: 588181052}
   - {fileID: 1040786050}

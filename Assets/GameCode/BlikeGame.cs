@@ -30,9 +30,11 @@ public class BlikeGame : MonoBehaviour
     private PlayerController _playerPrefab;
 
     [SerializeField]
-    private Transform[] _spawnPoints;
+    private Transform[] _spawnPointPositions;
 
     private List<PlayerController> _players;
+    private SpawnPoint[] _spawnPoints;
+    private List<Bomb> _activeBombs = new List<Bomb>();
 
     private struct SpawnPoint
     {
@@ -59,13 +61,13 @@ public class BlikeGame : MonoBehaviour
 
         UpdateTilesWithContent<Wall>(_terrain, null);
 
-        var nbSpawns = Math.Min(_spawnPoints.Length, playersCount);
-        var spawnPoints = new SpawnPoint[nbSpawns];
+        var nbSpawns = Math.Min(_spawnPointPositions.Length, playersCount);
+        _spawnPoints = new SpawnPoint[nbSpawns];
         for (int i = 0; i < nbSpawns; ++i)
         {
-            var tile = GetTile(_spawnPoints[i].position);
-            spawnPoints[i].Tile = tile;
-            spawnPoints[i].Position = GetTileCenter(tile);
+            var tile = GetTile(_spawnPointPositions[i].position);
+            _spawnPoints[i].Tile = tile;
+            _spawnPoints[i].Position = GetTileCenter(tile);
 
             // Flag all nearby tiles as SpawnArea to avoid spawning blocks on them
             var coords = tile.Coords;
@@ -86,27 +88,45 @@ public class BlikeGame : MonoBehaviour
                 }
             }
         }
-        spawnPoints.Shuffle();
         
         _players = new List<PlayerController>(playerModels.Count);
         for (int i = 0; i < playersCount; ++i)
         {
             var model = playerModels[i];
-
             var controller = Instantiate(_playerPrefab, _groundMesh.transform);
-            var spawn = spawnPoints[i];
-            var position = spawn.Position;
-            position.y += 0.5f*controller.CharacterController.height*controller.transform.localScale.y;
-            controller.transform.position = position;
-            controller.Initialize(model, spawn.Tile.Coords);
+            controller.Initialize(model);
 
             var playerView = controller.GetComponent<PlayerView>();
             playerView.Initialize(model.Color);
 
             _players.Add(controller);
-            spawn.Tile.Content.Add(controller);
         }
-        
+
+        ResetBoard();
+
+        GameFacade.PlayerMoved.Connect(OnPlayerMoved);
+        GameFacade.BombExploded.Connect(OnBombExploded);
+        GameFacade.BombInputPressed.Connect(OnBombInputPressed);
+    }
+
+    private void ResetBoard()
+    {
+        _spawnPoints.Shuffle();
+        for (int i = 0, count = _players.Count; i < count; ++i)
+        {
+            var controller = _players[i];
+            var spawn = _spawnPoints[i];
+
+            var position = spawn.Position;
+            position.y += 0.5f * controller.CharacterController.height * controller.transform.localScale.y;
+            controller.transform.position = position;
+            controller.Coords = spawn.Tile.Coords;
+            controller.gameObject.SetActive(true);
+
+            spawn.Tile.Content.Add(controller);
+            controller.InputBlocked = false;
+        }
+
         for (int i = 0; i < NB_COLUMNS; ++i)
         {
             for (int j = 0; j < NB_ROWS; ++j)
@@ -123,9 +143,7 @@ public class BlikeGame : MonoBehaviour
             }
         }
 
-        GameFacade.PlayerMoved.Connect(OnPlayerMoved);
-        GameFacade.BombExploded.Connect(OnBombExploded);
-        GameFacade.BombInputPressed.Connect(OnBombInputPressed);
+        GameFacade.RoundStart.Invoke();
     }
 
     private void OnPlayerMoved(PlayerController controller)
@@ -191,10 +209,8 @@ public class BlikeGame : MonoBehaviour
 
     private void OnBombExploded(Bomb bomb)
     {
-        var coords = bomb.Coords;
-        var tile = _tiles[coords.x, coords.y];
-        tile.Content.Remove(bomb);
-        Destroy(bomb.gameObject);
+        RemoveBomb(bomb);
+        _activeBombs.Remove(bomb);
 
         // TODO: Range should evolve with the player's bonuses
         var range = 3;
@@ -209,7 +225,43 @@ public class BlikeGame : MonoBehaviour
         if (nbActivePlayers <= 1)
         {
             int winnerIndex = nbActivePlayers == 0 ? -1 : _players.FindIndex(o => o == activePlayers[0]);
+            RoundOver(winnerIndex);
+        }
+    }
+
+    private void RemoveBomb(Bomb bomb)
+    {
+        var coords = bomb.Coords;
+        _tiles[coords.x, coords.y].Content.Remove(bomb);
+        Destroy(bomb.gameObject);
+    }
+
+    private void RoundOver(int winnerIndex)
+    {
+        for (int i = 0, count = _players.Count; i < count; ++i)
+        {
+            var player = _players[i];
+            player.InputBlocked = true;
+            if(player.gameObject.activeInHierarchy)
+            {
+                _tiles[player.Coords.x, player.Coords.y].Content.Remove(player);
+            }
+        }
+
+        for(int i = 0, count = _activeBombs.Count; i < count; ++i)
+        {
+            RemoveBomb(_activeBombs[i]);
+        }
+        _activeBombs.Clear();
+
+        var battleModel = ApplicationModels.GetModel<BattleModel>();
+        if (winnerIndex >= 0 && ++battleModel.Players[winnerIndex].Score == battleModel.NbRoundsToWin)
+        {
             GameFacade.GameOver.Invoke(winnerIndex);
+        }
+        else
+        {
+            GameFacade.RoundOver.Invoke(winnerIndex, ResetBoard);
         }
     }
 
@@ -264,14 +316,8 @@ public class BlikeGame : MonoBehaviour
                             for (int i = 0, count = players.Count; i < count; ++i)
                             {
                                 var player = players[i];
-                                if(bomb.Owner != player.Owner)
-                                {
-                                    var killer = battleModels.Find(p => p.PlayerModel == bomb.Owner);
-                                    ++killer.Score;
-                                }
                                 player.gameObject.SetActive(false);
                                 tile.Content.Remove(player);
-
 
                                 var victim = battleModels.Find(p => p.PlayerModel == player.Owner);
                                 victim.Events.Eliminated.Invoke();
@@ -293,6 +339,7 @@ public class BlikeGame : MonoBehaviour
             var bomb = Instantiate(_bombPrefab, position, Quaternion.identity, _groundMesh.transform);
             bomb.Initialize(player.Owner, tile.Coords);
             tile.Content.Add(bomb);
+            _activeBombs.Add(bomb);
         }
     }
 }

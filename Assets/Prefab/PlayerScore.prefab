@@ -222,7 +222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerColor: {fileID: 114041839388579536}
   _playerScore: {fileID: 114221692175362334}
-  _grayFilter: {fileID: 0}
+  _grayFilter: {fileID: 114556904791184954}
 --- !u!222 &222057075128694050
 CanvasRenderer:
   m_ObjectHideFlags: 1

@@ -3,6 +3,8 @@
 public class BattleModel
 {
     public List<PlayerBattleModel> Players { get; private set; }
+    
+    public int NbRoundsToWin { get; private set; }
 
     public BattleModel()
     {
@@ -13,5 +15,7 @@ public class BattleModel
         {
             Players.Add(new PlayerBattleModel(models[i]));
         }
+
+        NbRoundsToWin = 3;
     }
 }
