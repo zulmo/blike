@@ -43,7 +43,7 @@ public class BlikeMenu : MonoBehaviour
         if(gameModel.Players.Find(player => player.JoystickNumber == joystickNumber) == null)
         {
             int playerOrder = gameModel.Players.Count;
-            var color = ScriptableObjectsDatabase.PlayerColors.Colors[playerOrder];
+            var color = ScriptableObjectsDatabase.PlayerSettings.Colors[playerOrder];
 
             _playersItem[playerOrder].Open(playerOrder, color);
             gameModel.AddPlayer(joystickNumber, color);

@@ -3128,11 +3128,7 @@ MonoBehaviour:
   _groundMesh: {fileID: 12921019}
   _destructibleBlockPrefab: {fileID: 114502450710224888, guid: 28485b678d5d05140b0d85f8865a420d,
     type: 2}
-  _bombPrefab: {fileID: 114890869152658930, guid: 89dc1f95b9cb7124a8a778c2b62089b9,
-    type: 2}
   _view: {fileID: 1352470253}
-  _playerPrefab: {fileID: 114348374537660974, guid: c2f149ee416bdba44b299d79a440db2f,
-    type: 2}
   _spawnPointPositions:
   - {fileID: 499573885}
   - {fileID: 588181052}

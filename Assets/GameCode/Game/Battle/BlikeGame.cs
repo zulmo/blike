@@ -19,16 +19,10 @@ public class BlikeGame : MonoBehaviour
 
     [SerializeField]
     private DestructibleBlock _destructibleBlockPrefab;
-
-    [SerializeField]
-    private Bomb _bombPrefab;
-
+    
     [SerializeField]
     private LastOneStandingView _view;
-
-    [SerializeField]
-    private PlayerController _playerPrefab;
-
+    
     [SerializeField]
     private Transform[] _spawnPointPositions;
 
@@ -93,7 +87,7 @@ public class BlikeGame : MonoBehaviour
         for (int i = 0; i < playersCount; ++i)
         {
             var model = playerModels[i];
-            var controller = Instantiate(_playerPrefab, _groundMesh.transform);
+            var controller = Instantiate(ScriptableObjectsDatabase.PlayerSettings.PlayerPrefab, _groundMesh.transform);
             controller.Initialize(model);
 
             var playerView = controller.GetComponent<PlayerView>();
@@ -336,7 +330,7 @@ public class BlikeGame : MonoBehaviour
         var tile = GetTile(position);
         if(tile != null && !tile.HasBomb)
         {
-            var bomb = Instantiate(_bombPrefab, position, Quaternion.identity, _groundMesh.transform);
+            var bomb = Instantiate(ScriptableObjectsDatabase.PlayerSettings.BombPrefab, position, Quaternion.identity, _groundMesh.transform);
             bomb.Initialize(player.Owner, tile.Coords);
             tile.Content.Add(bomb);
             _activeBombs.Add(bomb);

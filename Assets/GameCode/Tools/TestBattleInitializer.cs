@@ -46,7 +46,7 @@ public class TestBattleInitializer : MonoBehaviour
         var joystickOffset = TestData.UseKeyboard ? 0 : 1;
         for(int i = 0; i < TestData.NbPlayers; ++i)
         {
-            model.AddPlayer(i + joystickOffset, ScriptableObjectsDatabase.PlayerColors.Colors[i]);
+            model.AddPlayer(i + joystickOffset, ScriptableObjectsDatabase.PlayerSettings.Colors[i]);
         }
 
         SceneManager.LoadScene(TestData.ScenePath, LoadSceneMode.Single);

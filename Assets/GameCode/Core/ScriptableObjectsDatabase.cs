@@ -2,10 +2,10 @@
 
 public static class ScriptableObjectsDatabase
 {
-    public static PlayerColors PlayerColors { get; private set; }
+    public static PlayerSettings PlayerSettings { get; private set; }
 
     public static void Initialize()
     {
-        PlayerColors = Resources.Load<PlayerColors>("PlayerColors");
+        PlayerSettings = Resources.Load<PlayerSettings>("PlayerSettings");
     }
 }

@@ -9,9 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63e4ab8e769427748af0670c5e7ccdeb, type: 3}
-  m_Name: PlayerColors
+  m_Name: PlayerSettings
   m_EditorClassIdentifier: 
-  Material: {fileID: 2100000, guid: de9fee656d01e4545b9b65b5075a68e4, type: 2}
+  PlayerPrefab: {fileID: 114348374537660974, guid: c2f149ee416bdba44b299d79a440db2f,
+    type: 3}
+  BombPrefab: {fileID: 114890869152658930, guid: 89dc1f95b9cb7124a8a778c2b62089b9,
+    type: 3}
   Colors:
   - {r: 0, g: 0, b: 1, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
