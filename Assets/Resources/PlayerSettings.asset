@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 114348374537660974, guid: c2f149ee416bdba44b299d79a440db2f,
-    type: 3}
+    type: 2}
   BombPrefab: {fileID: 114890869152658930, guid: 89dc1f95b9cb7124a8a778c2b62089b9,
-    type: 3}
+    type: 2}
   Colors:
   - {r: 0, g: 0, b: 1, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
