@@ -30,6 +30,9 @@ public class BlikeGame : MonoBehaviour
     private SpawnPoint[] _spawnPoints;
     private List<Bomb> _activeBombs = new List<Bomb>();
 
+    // TODO: setup dynamically
+    private IGameMode _gameMode = new LastOneStandingModel();
+
     private struct SpawnPoint
     {
         public Vector3 Position;
@@ -213,12 +216,10 @@ public class BlikeGame : MonoBehaviour
         PropagateExplosion(bomb, 0, -1, range);
         PropagateExplosion(bomb, 0, 1, range);
 
-        // Check remaining players
-        var activePlayers = _players.FindAll(controller => controller.gameObject.activeInHierarchy);
-        var nbActivePlayers = activePlayers.Count;
-        if (nbActivePlayers <= 1)
+        // Check win conditions
+        int winnerIndex;
+        if (_gameMode.IsRoundOver(_players, out winnerIndex))
         {
-            int winnerIndex = nbActivePlayers == 0 ? -1 : _players.FindIndex(o => o == activePlayers[0]);
             RoundOver(winnerIndex);
         }
     }
@@ -302,7 +303,7 @@ public class BlikeGame : MonoBehaviour
                             tileBomb.Explode();
                         }
 
-                        // Kill players hit by the bomb
+                        // Handle players hit by the bomb
                         var players = tile.Players;
                         if (players != null)
                         {
@@ -314,7 +315,7 @@ public class BlikeGame : MonoBehaviour
                                 tile.Content.Remove(player);
 
                                 var victim = battleModels.Find(p => p.PlayerModel == player.Owner);
-                                victim.Events.Eliminated.Invoke();
+                                _gameMode.OnPlayerHit(victim);
                             }
                         }                        
                     }
