@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class LastOneStandingView : MonoBehaviour
+public class LastOneStandingView : GameView
 {
     [SerializeField]
     private PlayerScoresTable _scoresTable;
@@ -8,16 +8,18 @@ public class LastOneStandingView : MonoBehaviour
     [SerializeField]
     private BattleResultScreen _resultScreen;
 
-    public void Initialize()
+    #region GameView abstract methods
+    public override void Initialize()
     {
         _scoresTable.Initialize();
         _resultScreen.Initialize();
         _resultScreen.gameObject.SetActive(false);
     }
 
-    public void Deinitialize()
+    public override void Deinitialize()
     {
         _scoresTable.Deinitialize();
         _resultScreen.Deinitialize();
     }
+    #endregion
 }

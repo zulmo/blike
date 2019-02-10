@@ -24,6 +24,14 @@ public class TestBattleInitializer : MonoBehaviour
         }
 
         [SerializeField]
+        private EGameMode _gameMode;
+        public EGameMode GameMode
+        {
+            get { return _gameMode; }
+            set { _gameMode = value; }
+        }
+
+        [SerializeField]
         private string _scenePath;
         public string ScenePath
         {
@@ -48,6 +56,8 @@ public class TestBattleInitializer : MonoBehaviour
         {
             model.AddPlayer(i + joystickOffset, ScriptableObjectsDatabase.PlayerSettings.Colors[i]);
         }
+
+        model.SelectedMode = _testData.GameMode;
 
         SceneManager.LoadScene(TestData.ScenePath, LoadSceneMode.Single);
     }

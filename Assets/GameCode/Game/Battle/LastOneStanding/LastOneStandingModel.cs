@@ -7,7 +7,8 @@ public class LastOneStandingModel : IGameMode
         throw new System.NotImplementedException();
     }
 
-    bool IGameMode.IsRoundOver(List<PlayerController> players, out int winnerIndex)
+    #region IGameMode
+    public bool IsRoundOver(List<PlayerController> players, out int winnerIndex)
     {
         winnerIndex = int.MinValue;
 
@@ -22,8 +23,9 @@ public class LastOneStandingModel : IGameMode
         return isOver;
     }
 
-    void IGameMode.OnPlayerHit(PlayerBattleModel victim)
+    public void OnPlayerHit(PlayerBattleModel victim)
     {
         victim.Events.Eliminated.Invoke();
     }
+    #endregion
 }

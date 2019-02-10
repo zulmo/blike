@@ -19,19 +19,16 @@ public class BlikeGame : MonoBehaviour
 
     [SerializeField]
     private DestructibleBlock _destructibleBlockPrefab;
-    
-    [SerializeField]
-    private LastOneStandingView _view;
-    
+        
     [SerializeField]
     private Transform[] _spawnPointPositions;
-
+    
     private List<PlayerController> _players;
     private SpawnPoint[] _spawnPoints;
     private List<Bomb> _activeBombs = new List<Bomb>();
 
-    // TODO: setup dynamically
-    private IGameMode _gameMode = new LastOneStandingModel();
+    private GameView _view;
+    private IGameMode _gameMode;
 
     private struct SpawnPoint
     {
@@ -43,6 +40,12 @@ public class BlikeGame : MonoBehaviour
     {
         ApplicationModels.RegisterModel<BattleModel>(new BattleModel());
 
+        var gameModel = ApplicationModels.GetModel<GameModel>();
+        var mode = gameModel.SelectedMode;
+
+        _gameMode = GameModeFactory.Create(mode);
+
+        _view = Instantiate(ScriptableObjectsDatabase.GameViews[mode]);
         _view.Initialize();
 
         for (int i = 0; i < NB_COLUMNS; ++i)
@@ -53,7 +56,7 @@ public class BlikeGame : MonoBehaviour
             }
         }
 
-        var playerModels = ApplicationModels.GetModel<GameModel>().Players;
+        var playerModels = gameModel.Players;
         int playersCount = playerModels.Count;
 
         UpdateTilesWithContent<Wall>(_terrain, null);

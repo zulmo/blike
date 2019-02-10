@@ -5,6 +5,7 @@ using UnityEditor.SceneManagement;
 public class BattleTestTool : EditorWindow
 {
     private static string ScenePath = "Assets/Scenes/TestLevel.unity";
+    private static GUILayoutOption[] EmptyOptions = new GUILayoutOption[0];
 
     [SerializeField]
     private TestBattleInitializer.Data _data;
@@ -25,6 +26,8 @@ public class BattleTestTool : EditorWindow
 
         _data.NbPlayers = EditorGUILayout.IntField("Nb players", _data.NbPlayers);
         _data.UseKeyboard = EditorGUILayout.Toggle("Use keyboard", _data.UseKeyboard);
+        _data.GameMode = (EGameMode) EditorGUILayout.EnumPopup("Game Mode", _data.GameMode, EmptyOptions);
+
         if (EditorApplication.isPlaying)
         {
             if (GUILayout.Button("Stop Battle"))
