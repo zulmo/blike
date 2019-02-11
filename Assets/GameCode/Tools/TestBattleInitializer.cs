@@ -38,6 +38,15 @@ public class TestBattleInitializer : MonoBehaviour
             get { return _scenePath; }
             set { _scenePath = value; }
         }
+        
+        // TODO: Replace by the actual layout of the level
+        [SerializeField]
+        private bool _spawnBlocks = true;
+        public bool SpawnBlocks
+        {
+            get { return _spawnBlocks; }
+            set { _spawnBlocks = value; }
+        }
     }
 
     [SerializeField]
@@ -58,6 +67,7 @@ public class TestBattleInitializer : MonoBehaviour
         }
 
         model.SelectedMode = _testData.GameMode;
+        model.SpawnBlocks = _testData.SpawnBlocks;
 
         SceneManager.LoadScene(TestData.ScenePath, LoadSceneMode.Single);
     }

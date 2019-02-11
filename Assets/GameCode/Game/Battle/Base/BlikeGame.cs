@@ -127,21 +127,24 @@ public class BlikeGame : MonoBehaviour
             controller.InputBlocked = false;
         }
 
-        for (int i = 0; i < NB_COLUMNS; ++i)
+        if(ApplicationModels.GetModel<GameModel>().SpawnBlocks)
         {
-            for (int j = 0; j < NB_ROWS; ++j)
+            for (int i = 0; i < NB_COLUMNS; ++i)
             {
-                var tile = _tiles[i, j];
-                if (tile.IsEmpty()) // No ignore flags => tile must be completely empty to receive a block (spawn areas stay empty)
+                for (int j = 0; j < NB_ROWS; ++j)
                 {
-                    var block = Instantiate(_destructibleBlockPrefab, _groundMesh.transform);
-                    var position = GetTileCenter(tile);
-                    position.y += 0.5f * block.BoxCollider.size.y * block.transform.localScale.y;
-                    block.transform.position = position;
-                    tile.Content.Add(block);
+                    var tile = _tiles[i, j];
+                    if (tile.IsEmpty()) // No ignore flags => tile must be completely empty to receive a block (spawn areas stay empty)
+                    {
+                        var block = Instantiate(_destructibleBlockPrefab, _groundMesh.transform);
+                        var position = GetTileCenter(tile);
+                        position.y += 0.5f * block.BoxCollider.size.y * block.transform.localScale.y;
+                        block.transform.position = position;
+                        tile.Content.Add(block);
+                    }
                 }
             }
-        }
+        }        
 
         GameFacade.RoundStart.Invoke();
     }
