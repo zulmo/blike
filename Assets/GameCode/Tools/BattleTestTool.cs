@@ -27,7 +27,7 @@ public class BattleTestTool : EditorWindow
         _data.NbPlayers = EditorGUILayout.IntField("Nb players", _data.NbPlayers);
         _data.UseKeyboard = EditorGUILayout.Toggle("Use keyboard", _data.UseKeyboard);
         _data.GameMode = (EGameMode) EditorGUILayout.EnumPopup("Game Mode", _data.GameMode, EmptyOptions);
-        _data.SpawnBlocks = EditorGUILayout.Toggle("Spawn Walls", _data.SpawnBlocks);
+        _data.SpawnBlocks = EditorGUILayout.Toggle("Spawn Blocks", _data.SpawnBlocks);
 
         if (EditorApplication.isPlaying)
         {
