@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: GameViews
   m_EditorClassIdentifier: 
   _views:
-    m_keys: 00000000
+    m_keys: 0000000001000000
     m_values:
     - {fileID: 114257979609144032, guid: 01974edd35056d84297febf94d85b06f, type: 2}
+    - {fileID: 114902088521121858, guid: 14e68eeae112d704386574ce3d7f1efd, type: 2}

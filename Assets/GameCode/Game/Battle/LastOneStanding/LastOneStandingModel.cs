@@ -1,29 +1,39 @@
-﻿using System.Collections.Generic;
-
-public class LastOneStandingModel : IGameMode
+﻿public class LastOneStandingModel : IGameMode
 {
-    public void CheckRoundOverCondition(PlayerController player, Bomb bomb)
+    public int NbRoundsToWin { get; private set; }
+
+    public LastOneStandingModel()
     {
-        throw new System.NotImplementedException();
+        NbRoundsToWin = 3;
     }
 
     #region IGameMode
-    public bool IsRoundOver(List<PlayerController> players, out int winnerIndex)
+    public void OnUpdate()
     {
-        winnerIndex = int.MinValue;
-
-        var activePlayers = players.FindAll(controller => controller.gameObject.activeInHierarchy);
-        var nbActivePlayers = activePlayers.Count;
-        bool isOver = nbActivePlayers <= 1;
-        if (isOver)
-        {
-            winnerIndex = nbActivePlayers == 0 ? -1 : players.FindIndex(o => o == activePlayers[0]);
-        }
-
-        return isOver;
     }
 
-    public void OnPlayerHit(PlayerBattleModel victim)
+    public void OnBombExploded()
+    {
+        var players = ApplicationModels.GetModel<BattleModel>().Players;
+        var activePlayers = players.FindAll(player => player.IsSpawned);
+        var nbActivePlayers = activePlayers.Count;
+        bool isRoundOver = nbActivePlayers <= 1;
+        if (isRoundOver)
+        {
+            int winnerIndex = -1;
+            bool isGameOver = false;
+
+            if(nbActivePlayers > 0)
+            {
+                var winner = activePlayers[0];
+                winnerIndex = players.FindIndex(winner);
+                isGameOver = ++winner.Score == NbRoundsToWin;
+            }
+            GameFacade.BattleEnd.Invoke(winnerIndex, isGameOver);
+        }
+    }
+
+    public void OnPlayerHit(PlayerBattleModel victim, PlayerBattleModel attacker)
     {
         victim.Events.Eliminated.Invoke();
     }

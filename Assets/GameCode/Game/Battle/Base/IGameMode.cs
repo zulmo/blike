@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-
-public interface IGameMode
+﻿public interface IGameMode
 {
-    void OnPlayerHit(PlayerBattleModel victim);
-    bool IsRoundOver(List<PlayerController> players, out int winnerIndex);
+    void OnUpdate();
+    void OnPlayerHit(PlayerBattleModel victim, PlayerBattleModel attacker);
+    void OnBombExploded();
 }

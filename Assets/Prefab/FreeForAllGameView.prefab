@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 4716202812871448}
   - component: {fileID: 114257979609144032}
   m_Layer: 0
-  m_Name: LastOneStandingView
+  m_Name: FreeForAllGameView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

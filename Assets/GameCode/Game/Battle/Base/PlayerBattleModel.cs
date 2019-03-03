@@ -1,6 +1,7 @@
 ﻿public class PlayerBattleModel
 {
     public PlayerModel PlayerModel { get; private set; }
+    public bool IsSpawned { get; set; }
 
     public PlayerBattleFacade Events { get; private set; }
 

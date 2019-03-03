@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class LastOneStandingView : GameView
+public class FreeForAllGameView : GameView
 {
     [SerializeField]
     private PlayerScoresTable _scoresTable;

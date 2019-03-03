@@ -7,6 +7,7 @@ public static class GameModeFactory
         switch(mode)
         {
             case EGameMode.LastOneStanding: return new LastOneStandingModel();
+            case EGameMode.TimedBattle: return new TimedBattleModel();
         }
 
         Debug.LogError(string.Format("Unhandled game mode: {0}", mode.ToString()));

@@ -43,6 +43,11 @@ public class Tile
         get { return (Bomb)GetContent(TileContentType.Bomb); }
     }
 
+    public bool HasPlayer
+    {
+        get { return HasContentType(TileContentType.Player); }
+    }
+
     public List<PlayerController> Players
     {
         get
