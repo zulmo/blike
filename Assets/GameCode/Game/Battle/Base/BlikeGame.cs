@@ -322,10 +322,7 @@ public class BlikeGame : MonoBehaviour
             coords.y += diffY;
             ++currentDistance;
             canPropagate = currentDistance <= range && coords.x >= 0 && coords.x < NB_COLUMNS && coords.y >= 0 && coords.y < NB_ROWS;
-            if(canPropagate)
-            {
-                OnExplosionOnTile(bomb, coords, contentIgnoreFlags);
-            }
+            canPropagate &= OnExplosionOnTile(bomb, coords, contentIgnoreFlags);
         }
         while (canPropagate);
     }
