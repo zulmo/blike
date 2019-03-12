@@ -261,10 +261,15 @@ public class BlikeGame : MonoBehaviour
 
         // TODO: Range should evolve with the player's bonuses
         var range = 3;
-        PropagateExplosion(bomb, -1, 0, range);
-        PropagateExplosion(bomb, 1, 0, range);
-        PropagateExplosion(bomb, 0, -1, range);
-        PropagateExplosion(bomb, 0, 1, range);
+
+        // Tiles containing only Spawn Areas are considered empty when it comes to explosions
+        var contentIgnoreFlags = 1 << (int)TileContentType.SpawnArea;
+
+        OnExplosionOnTile(bomb, bomb.Coords, contentIgnoreFlags);
+        PropagateExplosion(bomb, -1, 0, range, contentIgnoreFlags);
+        PropagateExplosion(bomb, 1, 0, range, contentIgnoreFlags);
+        PropagateExplosion(bomb, 0, -1, range, contentIgnoreFlags);
+        PropagateExplosion(bomb, 0, 1, range, contentIgnoreFlags);
 
         _gameMode.OnBombExploded();
     }
@@ -305,14 +310,11 @@ public class BlikeGame : MonoBehaviour
         }
     }
 
-    private void PropagateExplosion(Bomb bomb, int diffX, int diffY, int range)
+    private void PropagateExplosion(Bomb bomb, int diffX, int diffY, int range, int contentIgnoreFlags)
     {
         var currentDistance = 0;
         var coords = bomb.Coords;
         bool canPropagate = true;
-
-        // Tiles containing only Spawn Areas are considered empty when it comes to explosions
-        var contentIgnoreFlags = 1 << (int)TileContentType.SpawnArea;
 
         do
         {
@@ -322,56 +324,65 @@ public class BlikeGame : MonoBehaviour
             canPropagate = currentDistance <= range && coords.x >= 0 && coords.x < NB_COLUMNS && coords.y >= 0 && coords.y < NB_ROWS;
             if(canPropagate)
             {
-                var tile = _tiles[coords.x, coords.y];
-                if(!tile.IsEmpty(contentIgnoreFlags))
+                OnExplosionOnTile(bomb, coords, contentIgnoreFlags);
+            }
+        }
+        while (canPropagate);
+    }
+
+    private bool OnExplosionOnTile(Bomb bomb, Vector2Int coords, int contentIgnoreFlags)
+    {
+        var canPropagate = true;
+
+        var tile = _tiles[coords.x, coords.y];
+        if (!tile.IsEmpty(contentIgnoreFlags))
+        {
+            if (tile.IsWall)
+            {
+                canPropagate = false;
+            }
+            else if (tile.IsDestructibleBlock)
+            {
+                var block = tile.DestructibleBlock;
+                tile.Content.Remove(block);
+                Destroy(block.gameObject);
+                // TODO: Spawn bonus
+
+                canPropagate = false; // TODO: Depends on the player's bonus (spiked bomb?)
+            }
+            else
+            {
+                // TODO: determine if the explosion propagates when it hits a player or a bomb.
+                // For the moment, let's say yes
+                var tileBomb = tile.Bomb;
+                if (tileBomb)
                 {
-                    if(tile.IsWall)
+                    tileBomb.Explode();
+                }
+
+                // Handle players hit by the bomb
+                var players = tile.Players;
+                if (players != null)
+                {
+                    var battleModels = ApplicationModels.GetModel<BattleModel>().Players;
+                    for (int i = 0, count = players.Count; i < count; ++i)
                     {
-                        canPropagate = false;
-                    }
-                    else if (tile.IsDestructibleBlock)
-                    {
-                        var block = tile.DestructibleBlock;
-                        tile.Content.Remove(block);
-                        Destroy(block.gameObject);
-                        // TODO: Spawn bonus
+                        var player = players[i];
+                        player.gameObject.SetActive(false);
+                        tile.Content.Remove(player);
 
-                        canPropagate = false; // TODO: Depends on the player's bonus (spiked bomb?)
-                    }
-                    else
-                    {
-                        // TODO: determine if the explosion propagates when it hits a player or a bomb.
-                        // For the moment, let's say yes
-                        var tileBomb = tile.Bomb;
-                        if (tileBomb)
-                        {
-                            tileBomb.Explode();
-                        }
+                        var victim = battleModels.Find(p => p.PlayerModel == player.Owner);
+                        victim.IsSpawned = false;
 
-                        // Handle players hit by the bomb
-                        var players = tile.Players;
-                        if (players != null)
-                        {
-                            var battleModels = ApplicationModels.GetModel<BattleModel>().Players;
-                            for (int i = 0, count = players.Count; i < count; ++i)
-                            {
-                                var player = players[i];
-                                player.gameObject.SetActive(false);
-                                tile.Content.Remove(player);
+                        var attacker = battleModels.Find(p => p.PlayerModel == bomb.Owner);
 
-                                var victim = battleModels.Find(p => p.PlayerModel == player.Owner);
-                                victim.IsSpawned = false;
-
-                                var attacker = battleModels.Find(p => p.PlayerModel == bomb.Owner);
-
-                                _gameMode.OnPlayerHit(victim, attacker);
-                            }
-                        }                        
+                        _gameMode.OnPlayerHit(victim, attacker);
                     }
                 }
             }
         }
-        while (canPropagate);
+
+        return canPropagate;
     }
 
     private void OnBombInputPressed(PlayerController player)
