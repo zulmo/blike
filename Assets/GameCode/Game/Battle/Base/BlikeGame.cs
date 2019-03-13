@@ -314,17 +314,19 @@ public class BlikeGame : MonoBehaviour
     {
         var currentDistance = 0;
         var coords = bomb.Coords;
-        bool canPropagate = true;
 
         do
         {
             coords.x += diffX;
             coords.y += diffY;
             ++currentDistance;
-            canPropagate = currentDistance <= range && coords.x >= 0 && coords.x < NB_COLUMNS && coords.y >= 0 && coords.y < NB_ROWS;
-            canPropagate &= OnExplosionOnTile(bomb, coords, contentIgnoreFlags);
         }
-        while (canPropagate);
+        while ( currentDistance <= range &&
+                coords.x >= 0 &&
+                coords.x < NB_COLUMNS &&
+                coords.y >= 0 &&
+                coords.y < NB_ROWS &&
+                OnExplosionOnTile(bomb, coords, contentIgnoreFlags));
     }
 
     private bool OnExplosionOnTile(Bomb bomb, Vector2Int coords, int contentIgnoreFlags)
