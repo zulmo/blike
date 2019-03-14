@@ -5,26 +5,16 @@ using UnityEngine.UI;
 
 public class BattleResultScreen : MonoBehaviour
 {
-    private static string WinRoundTextFormat = "PLAYER {0} WINS THE ROUND!";
-    private static string WinGameTextFormat = "PLAYER {0} WINS THE GAME!";
-
     [Header("Round End")]
+    [SerializeField]
+    private RoundEndWidget _roundEndWidget;
+
     [SerializeField]
     private float _messageDuration;
 
-    [Header("Win Layout")]
+    [Header("Game Over")]
     [SerializeField]
-    private GameObject _winRoot;
-
-    [SerializeField]
-    private Image _winnerColor;
-
-    [SerializeField]
-    private Text _winText;
-
-    [Header("Draw Layout")]
-    [SerializeField]
-    private GameObject _drawRoot;
+    private GameEndWidget _gameEndWidget;
 
     public void Initialize()
     {
@@ -40,7 +30,9 @@ public class BattleResultScreen : MonoBehaviour
 
     public void OnRoundOver(int winnerIndex, Action callback)
     {
-        SetupLayout(winnerIndex, WinRoundTextFormat);
+        _roundEndWidget.Show(winnerIndex);
+        _gameEndWidget.gameObject.SetActive(false);
+        gameObject.SetActive(true);
         StartCoroutine(WaitAndHide(callback));
     }
 
@@ -53,23 +45,8 @@ public class BattleResultScreen : MonoBehaviour
 
     public void OnGameOver(int winnerIndex)
     {
-        SetupLayout(winnerIndex, WinGameTextFormat);
-    }
-
-    private void SetupLayout(int winnerIndex, string winTextFormat)
-    {
-        bool hasWinner = winnerIndex >= 0;
-
-        _winRoot.SetActive(hasWinner);
-        _drawRoot.SetActive(!hasWinner);
-
-        if(hasWinner)
-        {
-            var playerModel = ApplicationModels.GetModel<GameModel>().Players[winnerIndex];
-            _winnerColor.color = playerModel.Color;
-            _winText.text = string.Format(winTextFormat, winnerIndex + 1);
-        }
-
+        _gameEndWidget.Show(winnerIndex);
+        _roundEndWidget.gameObject.SetActive(false);
         gameObject.SetActive(true);
     }
 }

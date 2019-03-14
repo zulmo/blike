@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -14,5 +15,5 @@ MonoBehaviour:
   _views:
     m_keys: 0000000001000000
     m_values:
-    - {fileID: 114257979609144032, guid: 01974edd35056d84297febf94d85b06f, type: 2}
-    - {fileID: 114902088521121858, guid: 14e68eeae112d704386574ce3d7f1efd, type: 2}
+    - {fileID: 114257979609144032, guid: 01974edd35056d84297febf94d85b06f, type: 3}
+    - {fileID: 3648551373165435955, guid: c35b8e40c7e2b3a479b25221cfd1970c, type: 3}
