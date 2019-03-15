@@ -20,6 +20,11 @@
         }
     }
 
+    public static int CompareScores(PlayerBattleModel player, PlayerBattleModel otherPlayer)
+    {
+        return otherPlayer.Score - player.Score;
+    }
+
     public PlayerBattleModel(PlayerModel model)
     {
         PlayerModel = model;
