@@ -299,7 +299,6 @@ public class BlikeGame : MonoBehaviour
         }
         _activeBombs.Clear();
 
-        var battleModel = ApplicationModels.GetModel<BattleModel>();
         if (isGameOver)
         {
             GameFacade.GameOver.Invoke(winnerIndex);
