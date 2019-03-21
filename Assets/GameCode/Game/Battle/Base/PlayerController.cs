@@ -1,9 +1,16 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 // https://docs.unity3d.com/ScriptReference/CharacterController.Move.html
 public class PlayerController : MonoBehaviour, TileContent
 {
+    public enum InputStatus
+    {
+        Blocked,
+        Playing,
+        GameEnd_NotReady,
+        GameEnd_Ready
+    }
+
     [SerializeField]
     private float _speed = 1;
 
@@ -19,7 +26,7 @@ public class PlayerController : MonoBehaviour, TileContent
 
     public Vector2Int Coords { get; set; }
 
-    public bool InputBlocked { get; set; }
+    public InputStatus Status { get; set; }
 
     private string _horizontalAxis;
     private string _verticalAxis;
@@ -34,26 +41,45 @@ public class PlayerController : MonoBehaviour, TileContent
         _horizontalAxis = string.Format("Player{0}_Horizontal", joystick);
         _verticalAxis = string.Format("Player{0}_Vertical", joystick);
         _actionButton = string.Format("Player{0}_Action", joystick);
+
+        Status = InputStatus.Blocked;
     }
 
-    void FixedUpdate ()
+    void FixedUpdate()
     {
-        if(!InputBlocked)
+        switch(Status)
         {
-            // We need to use GetAxisRaw instead of GetAxis because the latter smooths the values, resulting in an unwanted inertia when using the keyboard
-            Vector3 moveDirection = new Vector3(Input.GetAxisRaw(_horizontalAxis), 0, Input.GetAxisRaw(_verticalAxis));
-            moveDirection = transform.TransformDirection(moveDirection);
-            if (!Mathf.Approximately(0f, moveDirection.magnitude))
+            case InputStatus.Playing:
             {
-                moveDirection *= _speed;
-                _controller.Move(moveDirection * Time.deltaTime);
-                GameFacade.PlayerMoved.Invoke(this);
-            }
+                // We need to use GetAxisRaw instead of GetAxis because the latter smooths the values, resulting in an unwanted inertia when using the keyboard
+                Vector3 moveDirection = new Vector3(Input.GetAxisRaw(_horizontalAxis), 0, Input.GetAxisRaw(_verticalAxis));
+                moveDirection = transform.TransformDirection(moveDirection);
+                if (!Mathf.Approximately(0f, moveDirection.magnitude))
+                {
+                    moveDirection *= _speed;
+                    _controller.Move(moveDirection * Time.deltaTime);
+                    GameFacade.PlayerMoved.Invoke(this);
+                }
 
-            if (Input.GetButtonUp(_actionButton))
-            {
-                GameFacade.BombInputPressed.Invoke(this);
+                if (Input.GetButtonUp(_actionButton))
+                {
+                    GameFacade.BombInputPressed.Invoke(this);
+                }
             }
+            break;
+
+            // Maybe we want to allow input only if the player is not ready yet? 
+            case InputStatus.GameEnd_NotReady:
+            case InputStatus.GameEnd_Ready:
+            {                
+                if (Input.GetButtonUp(_actionButton))
+                {
+                    bool wasReady = Status == InputStatus.GameEnd_Ready;
+                    Status = wasReady ? InputStatus.GameEnd_NotReady : InputStatus.GameEnd_Ready;
+                    GameFacade.ReadyInputPressed.Invoke(this, !wasReady);
+                }
+            }
+            break;
         }
 	}
 

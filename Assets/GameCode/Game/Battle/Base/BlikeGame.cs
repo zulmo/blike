@@ -9,6 +9,8 @@ public class BlikeGame : MonoBehaviour
     private static int NB_COLUMNS = 11;
     private static int NB_ROWS = 11;
 
+    private static Vector3 OFF_SCREEN_POSITION = new Vector3(1337f, 1337f, 1337f);
+
     private Tile[,] _tiles = new Tile[NB_COLUMNS, NB_ROWS];
 
     [SerializeField]
@@ -117,8 +119,9 @@ public class BlikeGame : MonoBehaviour
         GameFacade.BombExploded.Connect(OnBombExploded);
         GameFacade.BombInputPressed.Connect(OnBombInputPressed);
         GameFacade.BattleEnd.Connect(OnBattleEnd);
+        GameFacade.AllPlayersReadyForNextGame.Connect(OnLeave);
     }
-    
+
     private void ResetBoard()
     {
         _spawnPoints.Shuffle();
@@ -159,11 +162,10 @@ public class BlikeGame : MonoBehaviour
         position.y += 0.5f * controller.CharacterController.height * controller.transform.localScale.y;
         controller.transform.position = position;
         controller.Coords = spawn.Tile.Coords;
-        controller.gameObject.SetActive(true);
 
         spawn.Tile.Content.Add(controller);
         model.IsSpawned = true;
-        controller.InputBlocked = false;
+        controller.Status = PlayerController.InputStatus.Playing;
     }
 
     private void SpawnPlayer(PlayerController controller, int spawnIndex)
@@ -286,11 +288,12 @@ public class BlikeGame : MonoBehaviour
         for (int i = 0, count = _players.Count; i < count; ++i)
         {
             var player = _players[i];
-            player.InputBlocked = true;
-            if(player.gameObject.activeInHierarchy)
+            if (player.Status == PlayerController.InputStatus.Playing)
             {
                 _tiles[player.Coords.x, player.Coords.y].Content.Remove(player);
             }
+
+            player.Status = PlayerController.InputStatus.GameEnd_NotReady;
         }
 
         for(int i = 0, count = _activeBombs.Count; i < count; ++i)
@@ -366,7 +369,8 @@ public class BlikeGame : MonoBehaviour
                     for (int i = 0, count = players.Count; i < count; ++i)
                     {
                         var player = players[i];
-                        player.gameObject.SetActive(false);
+                        player.transform.position = OFF_SCREEN_POSITION;
+                        player.Status = PlayerController.InputStatus.Blocked;
                         tile.Content.Remove(player);
 
                         var victim = battleModels.Find(p => p.PlayerModel == player.Owner);
@@ -394,5 +398,16 @@ public class BlikeGame : MonoBehaviour
             tile.Content.Add(bomb);
             _activeBombs.Add(bomb);
         }
+    }
+
+    private void OnLeave()
+    {
+        // TODO: When we have menus, get the player back to them
+        // For now, leave the application
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

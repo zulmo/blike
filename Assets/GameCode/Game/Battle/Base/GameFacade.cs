@@ -12,4 +12,6 @@ public static class GameFacade
     public static readonly FacadeEvent<int, bool> BattleEnd = new FacadeEvent<int, bool>();
     public static readonly FacadeEvent<int, Action> RoundOver = new FacadeEvent<int, Action>();
     public static readonly FacadeEvent<int> GameOver = new FacadeEvent<int>();
+    public static readonly FacadeEvent<PlayerController, bool> ReadyInputPressed = new FacadeEvent<PlayerController, bool>();
+    public static readonly FacadeEvent AllPlayersReadyForNextGame = new FacadeEvent();
 }
