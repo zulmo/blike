@@ -1,4 +1,4 @@
-#Start form scene 0
+# Start form scene 0
 
 To force the editor to launch the game from scene 0 (just like a standalone build would), go to Edit menu and select Always Start From Scene 0.
 
@@ -8,7 +8,7 @@ Relevant source file:
 _PlayFromFirstScene.cs_
 
 
-#Battle Tester
+# Battle Tester
 The Battle Tester is a tool meant to bypass the player selection when you want to play a battle, and to be able to play with as many players as you want without needing the proper amount of controllers. The main goal is to be efficient when working on a specific game mode and be able to iterate on said mode without losing time in other parts of the game. This tool isn't affected by the Always Start From Scene 0 setting.
 
 To access it, go to Tools, then Battle Tester. Here is the screen you will see:
