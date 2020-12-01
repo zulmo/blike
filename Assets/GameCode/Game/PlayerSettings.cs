@@ -6,5 +6,6 @@ public class PlayerSettings : ScriptableObject
 {
     public PlayerController PlayerPrefab;
     public Bomb BombPrefab;
+    public GameObject ExplosionPrefab;
     public List<Color> Colors;
 }

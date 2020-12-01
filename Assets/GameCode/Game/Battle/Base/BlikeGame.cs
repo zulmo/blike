@@ -334,8 +334,11 @@ public class BlikeGame : MonoBehaviour
     private bool OnExplosionOnTile(Bomb bomb, Vector2Int coords, int contentIgnoreFlags)
     {
         var canPropagate = true;
-
         var tile = _tiles[coords.x, coords.y];
+        Vector3 position = GetTileCenter(tile);
+        var explosion = Instantiate(ScriptableObjectsDatabase.PlayerSettings.ExplosionPrefab, position, Quaternion.identity, _groundMesh.transform);
+        Destroy(explosion, 1);
+        //Debug.Log("spawning explosion at : " + position);
         if (!tile.IsEmpty(contentIgnoreFlags))
         {
             if (tile.IsWall)
